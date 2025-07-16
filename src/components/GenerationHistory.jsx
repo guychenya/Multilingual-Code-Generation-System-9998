@@ -4,7 +4,7 @@ import SafeIcon from '../common/SafeIcon';
 import * as FiIcons from 'react-icons/fi';
 import { formatDistanceToNow } from 'date-fns';
 
-const { FiClock, FiCode, FiEye } = FiIcons;
+const { FiClock, FiCode, FiEye, FiChevronRight } = FiIcons;
 
 const GenerationHistory = ({ history, onSelect }) => {
   return (
@@ -31,17 +31,33 @@ const GenerationHistory = ({ history, onSelect }) => {
               onClick={() => onSelect(entry)}
             >
               <div className="flex items-center justify-between mb-2">
-                <span className="bg-purple-600 text-white px-2 py-1 rounded text-xs font-medium">
-                  {entry.language}
-                </span>
-                <SafeIcon icon={FiEye} className="text-gray-400 text-sm opacity-0 group-hover:opacity-100 transition-opacity" />
+                <div className="flex items-center space-x-2">
+                  <span className="bg-purple-600 text-white px-2 py-1 rounded text-xs font-medium">
+                    {entry.language}
+                  </span>
+                  <span className="text-gray-400 text-xs">
+                    {formatDistanceToNow(new Date(entry.timestamp), { addSuffix: true })}
+                  </span>
+                </div>
+                <SafeIcon
+                  icon={FiEye}
+                  className="text-gray-400 text-sm opacity-0 group-hover:opacity-100 transition-opacity"
+                />
               </div>
+              
               <p className="text-white text-sm font-medium mb-1 line-clamp-2">
                 {entry.prompt}
               </p>
-              <p className="text-gray-400 text-xs">
-                {formatDistanceToNow(new Date(entry.timestamp), { addSuffix: true })}
-              </p>
+              
+              <div className="flex items-center justify-between mt-2">
+                <div className="text-xs text-gray-400 line-clamp-1 font-mono bg-black/30 px-2 py-1 rounded flex-1 mr-2">
+                  {entry.code.substring(0, 40)}...
+                </div>
+                <SafeIcon
+                  icon={FiChevronRight}
+                  className="text-purple-400 opacity-0 group-hover:opacity-100 transition-opacity"
+                />
+              </div>
             </motion.div>
           ))}
         </div>

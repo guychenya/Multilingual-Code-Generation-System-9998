@@ -17,7 +17,7 @@ const CodeGenerator = () => {
   const [loading, setLoading] = useState(false);
   const [history, setHistory] = useState([]);
   const [activeView, setActiveView] = useState('code'); // 'code' or 'execution'
-  
+
   // Load history from localStorage on component mount
   useEffect(() => {
     const savedHistory = localStorage.getItem('codeGenerationHistory');
@@ -28,11 +28,25 @@ const CodeGenerator = () => {
         console.error('Error parsing saved history:', error);
       }
     }
+    
+    // Check if there's a selected history entry to load
+    const selectedEntry = localStorage.getItem('selectedHistoryEntry');
+    if (selectedEntry) {
+      try {
+        const entry = JSON.parse(selectedEntry);
+        setPrompt(entry.prompt);
+        setLanguage(entry.language);
+        setGeneratedCode(entry.code);
+        // Clear the entry after loading
+        localStorage.removeItem('selectedHistoryEntry');
+      } catch (error) {
+        console.error('Error loading selected history entry:', error);
+      }
+    }
   }, []);
 
   const handleGenerate = async () => {
     if (!prompt.trim()) return;
-    
     setLoading(true);
     try {
       const result = await generateCode(prompt, language);
@@ -125,7 +139,7 @@ const CodeGenerator = () => {
               </div>
             </div>
           </div>
-          
+
           {/* Generated Code */}
           {generatedCode && (
             <motion.div
@@ -147,7 +161,6 @@ const CodeGenerator = () => {
                   <SafeIcon icon={FiCode} className="inline mr-2" />
                   Code
                 </button>
-                
                 <button
                   className={`py-2 px-4 text-sm font-medium ${
                     activeView === 'execution'
@@ -160,19 +173,18 @@ const CodeGenerator = () => {
                   Execution
                 </button>
               </div>
-              
+
               {/* Tab content */}
               <div className={activeView === 'code' ? 'block' : 'hidden'}>
                 <CodeEditor code={generatedCode} language={language} />
               </div>
-              
               <div className={activeView === 'execution' ? 'block' : 'hidden'}>
                 <CodeRunner code={generatedCode} language={language} />
               </div>
             </motion.div>
           )}
         </div>
-        
+
         {/* History Section */}
         <div className="lg:col-span-1">
           <GenerationHistory
